@@ -48,13 +48,13 @@ Chaque photo suit un processus précis pour garantir la qualité du contenu :
 ### Diagramme de Use Cases
 Ce diagramme détaille les actions possibles pour chaque acteur (Upload, Like, Modération).
 
-![Diagramme Use Case](Conception/Use-case.png)
+![Diagramme Use Case](Conception/Use-case.jpg)
 
 
 ### Diagramme de Classes
 L'architecture logicielle repose sur une classe mère `User` et une gestion de photos avec métadonnées techniques.
 
-![Diagramme de Classes](Conception/class-diagram.png)
+![Diagramme de Classes](Conception/class-diagrame.png)
 
 
 ---
