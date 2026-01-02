@@ -36,4 +36,22 @@ class BasicUser extends User {
     }
 
 }
+
+
+class ProUser extends BasicUser {
+    private string $subscriptionStart;
+    private string $subscriptionEnd;
+
+    public function __construct(string $username, string $email, string $password, string $start, string $end) {
+        parent::__construct($username, $email, $password);
+        $this->subscriptionStart = $start;
+        $this->subscriptionEnd = $end;
+    }
+
+    
+    public function canCreatePrivateAlbum(): bool {
+        return true ;
+    }
+}
+
 ?>
