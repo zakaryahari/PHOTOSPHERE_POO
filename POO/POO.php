@@ -21,4 +21,19 @@ abstract class User {
     abstract public function canCreatePrivateAlbum(): bool;
 }
 
+class BasicUser extends User {
+    protected int $uploadCount;
+
+    public function __construct(string $username, string $email, string $password, int $uploadCount = 0) {
+        parent::__construct($username, $email, $password);
+        $this->uploadCount = $uploadCount;
+    }
+
+    public function resetCounter(): bool {}
+
+    public function canCreatePrivateAlbum(): bool {
+        return false ;
+    }
+
+}
 ?>
