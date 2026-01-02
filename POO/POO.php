@@ -64,9 +64,22 @@ class Moderator extends User {
 
     
     public function canCreatePrivateAlbum(): bool {
-        return false ;
+        return true ;
     }
 }
 
+
+class Admin extends User {
+    private bool $isSuper;
+
+    public function __construct(string $username, string $email, string $password, bool $isSuper = false) {
+        parent::__construct($username, $email, $password);
+        $this->isSuper = $isSuper;
+    }
+
+    public function canCreatePrivateAlbum(): bool {
+        return true ;
+    }
+}
 
 ?>
