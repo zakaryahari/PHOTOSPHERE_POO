@@ -95,7 +95,7 @@ CREATE TABLE Comment (
 );
 
 CREATE TABLE Likes (
-    id_user INT,
+    id_user INT ,
     id_photo INT,
     created_at DATETIME DEFAULT CURRENT_DATE,
     PRIMARY KEY (id_user, id_photo),
