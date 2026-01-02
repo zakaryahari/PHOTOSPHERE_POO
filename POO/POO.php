@@ -17,6 +17,8 @@ abstract class User {
     }
 
     public function login(): bool {}
+
+    abstract public function canCreatePrivateAlbum(): bool;
 }
 
 ?>
