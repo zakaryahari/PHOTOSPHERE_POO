@@ -54,4 +54,19 @@ class ProUser extends BasicUser {
     }
 }
 
+class Moderator extends User {
+    protected string $level;
+
+    public function __construct(string $username, string $email, string $password, string $level) {
+        parent::__construct($username, $email, $password);
+        $this->level = $level;
+    }
+
+    
+    public function canCreatePrivateAlbum(): bool {
+        return false ;
+    }
+}
+
+
 ?>
