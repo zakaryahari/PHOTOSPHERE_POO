@@ -17,7 +17,7 @@ CREATE TABLE User (
 CREATE TABLE Basic_User (
     id_user INT PRIMARY KEY,
     upload_count INT DEFAULT 0, 
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
 
 
@@ -26,21 +26,21 @@ CREATE TABLE Pro_User (
     subscription_start DATETIME, 
     subscription_end DATETIME, 
     CONSTRAINT chk_dates CHECK (subscription_start < subscription_end),
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
 
 
 CREATE TABLE Moderator (
     id_user INT PRIMARY KEY,
     level ENUM('junior', 'senior', 'lead'), 
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
 
 
 CREATE TABLE Admin (
     id_user INT PRIMARY KEY,
     is_super BOOLEAN DEFAULT FALSE, 
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
 
 CREATE TABLE Photo (
@@ -57,7 +57,7 @@ CREATE TABLE Photo (
     created_at DATETIME DEFAULT CURRENT_DATE,
     updated_at DATETIME ON UPDATE CURRENT_DATE,
     id_user INT NOT NULL,
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
 
 CREATE TABLE Album (
@@ -70,7 +70,7 @@ CREATE TABLE Album (
     created_at DATETIME DEFAULT CURRENT_DATE,
     updated_at DATETIME ON UPDATE CURRENT_DATE,
     id_user INT NOT NULL,
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
 
 CREATE TABLE Tag (
@@ -89,8 +89,8 @@ CREATE TABLE Comment (
     id_user INT NOT NULL,
     id_photo INT NOT NULL,
     parent_id INT,
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE,
-    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) ON DELETE CASCADE,
+    FOREIGN KEY (id_user) REFERENCES User(id_user) ,
+    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) ,
     FOREIGN KEY (parent_id) REFERENCES Comment(id_comment) ON DELETE SET NULL
 );
 
@@ -99,24 +99,24 @@ CREATE TABLE Likes (
     id_photo INT,
     created_at DATETIME DEFAULT CURRENT_DATE,
     PRIMARY KEY (id_user, id_photo),
-    FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE CASCADE,
-    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) ON DELETE CASCADE
+    FOREIGN KEY (id_user) REFERENCES User(id_user) ,
+    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) 
 );
 
 CREATE TABLE Photo_Albums (
     id_photo INT,
     id_album INT,
     PRIMARY KEY (id_photo, id_album),
-    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) ON DELETE CASCADE,
-    FOREIGN KEY (id_album) REFERENCES Album(id_album) ON DELETE CASCADE
+    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) ,
+    FOREIGN KEY (id_album) REFERENCES Album(id_album) 
 );
 
 CREATE TABLE Photo_Tags (
     id_photo INT,
     id_tag INT,
     PRIMARY KEY (id_photo, id_tag),
-    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) ON DELETE CASCADE,
-    FOREIGN KEY (id_tag) REFERENCES Tag(id_tag) ON DELETE CASCADE
+    FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) ,
+    FOREIGN KEY (id_tag) REFERENCES Tag(id_tag) 
 );
 
 CREATE TABLE Audit_Log (
