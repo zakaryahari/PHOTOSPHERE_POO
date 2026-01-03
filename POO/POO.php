@@ -403,7 +403,15 @@ class Comment {
 
     public function isReply(): bool { }
 
-    public function canBeEditedBy(User $user): bool {}
+    public function canBeEditedBy(User $user): bool {
+        if ($user instanceof Moderator) {
+            $user->canManageComment();  
+        }
+        if ($user->getId() == $this->userId) {
+            return true;
+        }
+        return false;
+    }
 }
 
 class Tag {
@@ -423,4 +431,5 @@ class Tag {
     }
     public function setName(string $name): void { }
 }
+
 ?>
