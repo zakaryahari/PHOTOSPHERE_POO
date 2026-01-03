@@ -96,7 +96,13 @@ class BasicUser extends User {
         return false ;
     }
 
-    
+    public function canUploadPhoto() : bool {
+        return $this->uploadCount < 11 ;
+    }
+
+    public function resetCounter(): void {
+        $this->uploadCount = 0;
+    }
 }
 
 
