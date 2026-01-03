@@ -10,13 +10,25 @@ abstract class User {
     protected string $bio;
     protected string $profilePicture;
 
-    public function __construct(string $username, string $email, string $password) {
-        $this->username = $username;
-        $this->email = $email;
-        $this->password = $password;
+    public function __construct(array $data) {
+        $this->id = $data['id_user'] ?? 0;
+        $this->username = $data['username'];
+        $this->email = $data['email'];
+        $this->password = $data['password'];
+        $this->bio = $data['bio'] ?? null;
+        $this->profilePicture = $data['profile_picture'] ?? null;
+        $this->createdAt = $data['created_at'] ?? date('Y-m-d H:i:s');
     }
 
-    public function login(): bool {}
+    // public function login(): bool {}
+
+    public function verifyPassword($input): bool {
+        return password_verify($input , $this->password);
+    }
+
+    public function updateLastLogin() {
+        $this->lastLogin =  date('Y-m-d H:i:s');
+    }
 
     abstract public function canCreatePrivateAlbum(): bool;
 }
@@ -38,7 +50,7 @@ class BasicUser extends User {
 }
 
 
-class ProUser extends BasicUser {
+class ProUser extends User {
     private string $subscriptionStart;
     private string $subscriptionEnd;
 
