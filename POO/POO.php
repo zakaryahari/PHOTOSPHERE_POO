@@ -123,7 +123,7 @@ class ProUser extends User {
 
     public function __construct(array $data) {
         parent::__construct($data);
-        $this->subscriptionStart = $data['subscription_start'];
+        $this->subscriptionStart = new DateTime($data['subscription_start']);
         $this->subscriptionEnd = clone $this->subscriptionStart;
         $this->subscriptionEnd->add(new DateInterval('P30D'));
     }
@@ -238,6 +238,79 @@ class Admin extends User {
     public function canUploadPhoto() : bool {
         return true ;
     }
+}
+
+class Photo {
+    protected int $id;
+    protected string $title;
+    protected ?string $description;
+    protected string $fileName;
+    protected int $fileSize;
+    protected string $mimeType;
+    protected string $dimensions;
+    protected string $state;
+    protected int $viewCount;
+    protected int $userId;
+
+    public function __construct(array $data) {
+        $this->id = $data['id_photo'] ?? 0;
+        $this->title = $data['title'];
+        $this->description = $data['description'] ?? null;
+        $this->fileName = $data['file_name'];
+        $this->fileSize = $data['file_size'];
+        $this->mimeType = $data['mime_type'];
+        $this->dimensions = $data['dimensions'];
+        $this->state = $data['state'] ?? 'draft';
+        $this->viewCount = $data['view_count'] ?? 0;
+        $this->userId = $data['id_user'];
+    }
+
+    // Getters & Setters
+    public function getId(): int { 
+        return $this->id; 
+    }
+
+    public function getTitle(): string { 
+        return $this->title; 
+    }
+
+    public function getDescription(): ?string { 
+        return $this->description; 
+    }
+
+    public function getFileName(): string { 
+        return $this->fileName; 
+    }
+
+    public function getFileSize(): int { 
+        return $this->fileSize; 
+    }
+
+    public function getMimeType(): string { 
+        return $this->mimeType; 
+    }
+
+    public function getDimensions(): string { 
+        return $this->dimensions; 
+    }
+
+    public function getState(): string { 
+        return $this->state; 
+    }
+
+    public function getViewCount(): int { 
+        return $this->viewCount; 
+    }
+
+    public function getUserId(): int { 
+        return $this->userId; 
+    }
+
+    public function setTitle(string $title): void {}
+    public function setState(string $state): void {}
+
+
+    public function isPublished(): bool {}
 }
 
 ?>
