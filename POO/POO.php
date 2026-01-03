@@ -313,4 +313,54 @@ class Photo {
     public function isPublished(): bool {}
 }
 
+class Album {
+    protected int $id;
+    protected string $name;
+    protected ?string $description;
+    protected bool $isPublic;
+    protected int $userId;
+    protected DateTime $createdAt;
+
+    public function __construct(array $data) {
+        $this->id = $data['id_album'] ?? 0;
+        $this->name = $data['name'];
+        $this->description = $data['description'] ?? null;
+        $this->isPublic = (bool)($data['is_public'] ?? true);
+        $this->userId = $data['id_user'];
+        $this->createdAt = new DateTime($data['created_at'] ?? 'now');
+    }
+
+
+    public function getId(): int { 
+        return $this->id; 
+    }
+
+    public function getName(): string { 
+        return $this->name; 
+    }
+
+    public function getDescription(): ?string { 
+        return $this->description; 
+    }
+
+    public function getIsPublic(): bool { 
+        return $this->isPublic; 
+    }
+
+    public function getUserId(): int { 
+        return $this->userId; 
+    }
+
+    public function getCreatedAt(): DateTime { 
+        return $this->createdAt; 
+    }
+
+
+    public function setName(string $name): void { }
+    public function setIsPublic(bool $status): void { }
+
+
+    public function canAccess(User $user): bool {}
+}
+
 ?>
