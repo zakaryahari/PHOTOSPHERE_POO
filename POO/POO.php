@@ -11,7 +11,7 @@ abstract class User {
     protected ?string $profilePicture;
 
     public function __construct(array $data) {
-        $this->id = $data['id_user'] ?? 0;
+        $this->id = $data['id_user'];
         $this->username = $data['username'];
         $this->email = $data['email'];
         $this->password = $data['password'];
@@ -253,7 +253,7 @@ class Photo {
     protected int $userId;
 
     public function __construct(array $data) {
-        $this->id = $data['id_photo'] ?? 0;
+        $this->id = $data['id_photo'];
         $this->title = $data['title'];
         $this->description = $data['description'] ?? null;
         $this->fileName = $data['file_name'];
@@ -322,7 +322,7 @@ class Album {
     protected DateTime $createdAt;
 
     public function __construct(array $data) {
-        $this->id = $data['id_album'] ?? 0;
+        $this->id = $data['id_album'];
         $this->name = $data['name'];
         $this->description = $data['description'] ?? null;
         $this->isPublic = (bool)($data['is_public'] ?? true);
@@ -372,7 +372,7 @@ class Comment {
     protected DateTime $createdAt;
 
     public function __construct(array $data) {
-        $this->id = $data['id_comment'] ?? 0;
+        $this->id = $data['id_comment'];
         $this->content = $data['content'];
         $this->userId = $data['id_user'];
         $this->photoId = $data['id_photo'];
@@ -406,4 +406,21 @@ class Comment {
     public function canBeEditedBy(User $user): bool {}
 }
 
+class Tag {
+    protected int $id;
+    protected string $name;
+
+    public function __construct(array $data) {
+        $this->id = $data['id_tag'];
+        $this->name = $data['name'];
+    }
+
+    public function getId(): int { 
+        return $this->id; 
+    }
+    public function getName(): string { 
+        return $this->name; 
+    }
+    public function setName(string $name): void { }
+}
 ?>
