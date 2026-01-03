@@ -360,7 +360,12 @@ class Album {
     public function setIsPublic(bool $status): void { }
 
 
-    public function canAccess(User $user): bool {}
+    public function canAccess(User $user): bool {
+        if ($user->getId() == $this->userId) {
+            return true;
+        }
+        return false;
+    }
 }
 
 class Comment {
