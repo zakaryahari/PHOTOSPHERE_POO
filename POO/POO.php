@@ -156,14 +156,49 @@ class ProUser extends User {
 }
 
 class Moderator extends User {
-    protected string $level;
+    protected string $level = 'senior';
 
     public function __construct(string $username, string $email, string $password, string $level) {
         parent::__construct($username, $email, $password);
         $this->level = $level;
     }
 
+    // Getters & Setters
+
+    public function getlevel() : string {
+        return $this->level;
+    }
+
+    public function setlevel(string $level) : void {
+        $allowed = ['junior','senior', 'lead'];
+        if (in_array($level , $allowed)) {
+            $this->level = $level;
+        }
+    }
     
+    public function canManageComment(string $action): bool {
+        if ($this->level === 'junior') {
+            return ($action === 'hide' || $action === 'flag');
+        }
+        
+        if ($this->level === 'senior' || $this->level === 'lead') {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canSuspendUser(User $targetUser): bool {
+        if ($targetUser instanceof Admin) {
+            return false ;
+        }
+
+        if ($this->level == 'junior') {
+            return false ;
+        }
+        return true;
+    }
+
     public function canCreatePrivateAlbum(): bool {
         return true ;
     }
