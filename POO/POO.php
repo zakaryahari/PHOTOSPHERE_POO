@@ -118,13 +118,28 @@ class BasicUser extends User {
 
 
 class ProUser extends User {
-    private string $subscriptionStart;
-    private string $subscriptionEnd;
+    private DateTime $subscriptionStart;
+    private DateTime $subscriptionEnd;
 
-    public function __construct(string $username, string $email, string $password, string $start, string $end) {
+    public function __construct(string $username, string $email, string $password, DateTime $start) {
         parent::__construct($username, $email, $password);
         $this->subscriptionStart = $start;
-        $this->subscriptionEnd = $end;
+        $this->subscriptionEnd = clone $this->subscriptionStart;
+        $this->subscriptionEnd->add(new DateInterval('P30D'));
+    }
+
+    // Getters & Setters
+
+    public function getSubscriptionEnd() : DateTime {
+        return $this->subscriptionEnd;
+    }
+
+    public function getSubscriptionStart() : DateTime {
+        return $this->subscriptionStart;
+    }
+    
+    public function setSubscriptionEnd(DateTime $date) : void {
+        $this->subscriptionEnd = $date;
     }
 
     public function canCreatePrivateAlbum(): bool {
@@ -133,6 +148,10 @@ class ProUser extends User {
 
     public function canUploadPhoto() : bool {
         return true ;
+    }
+
+    public function isSubscriptionActive() : bool {
+        return date('Y-m-d H:i:s') < $this->subscriptionEnd;
     }
 }
 
