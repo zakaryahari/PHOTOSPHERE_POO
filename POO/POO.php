@@ -176,9 +176,9 @@ class Moderator extends User {
         }
     }
     
-    public function canManageComment(string $action): bool {
+    public function canManageComment(): bool {
         if ($this->level === 'junior') {
-            return ($action === 'hide' || $action === 'flag');
+            return false;
         }
         
         if ($this->level === 'senior' || $this->level === 'lead') {
@@ -361,6 +361,49 @@ class Album {
 
 
     public function canAccess(User $user): bool {}
+}
+
+class Comment {
+    protected int $id;
+    protected string $content;
+    protected int $userId;
+    protected int $photoId;
+    protected ?int $parentId;
+    protected DateTime $createdAt;
+
+    public function __construct(array $data) {
+        $this->id = $data['id_comment'] ?? 0;
+        $this->content = $data['content'];
+        $this->userId = $data['id_user'];
+        $this->photoId = $data['id_photo'];
+        $this->parentId = $data['parent_id'] ?? null;
+        $this->createdAt = new DateTime($data['created_at'] ?? 'now');
+    }
+
+    public function getId(): int { 
+        return $this->id; 
+    }
+    public function getContent(): string { 
+        return $this->content; 
+    }
+    public function getUserId(): int { 
+        return $this->userId; 
+    }
+    public function getPhotoId(): int { 
+        return $this->photoId; 
+    }
+    public function getParentId(): ?int { 
+        return $this->parentId; 
+    }
+    public function getCreatedAt(): DateTime { 
+        return $this->createdAt; 
+    }
+
+    public function setContent(string $content): void { }
+
+    public function isReply(): bool { }
+
+    public function canBeEditedBy(User $user): bool {}
 }
 
 ?>
