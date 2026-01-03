@@ -7,8 +7,8 @@ abstract class User {
     protected string $password;
     protected DateTime $createdAt;
     protected DateTime $lastLogin;
-    protected string $bio;
-    protected string $profilePicture;
+    protected ?string $bio;
+    protected ?string $profilePicture;
 
     public function __construct(array $data) {
         $this->id = $data['id_user'] ?? 0;
@@ -17,7 +17,7 @@ abstract class User {
         $this->password = $data['password'];
         $this->bio = $data['bio'] ?? null;
         $this->profilePicture = $data['profile_picture'] ?? null;
-        $this->createdAt = $data['created_at'] ?? date('Y-m-d H:i:s');
+        $this->createdAt = new DateTime($data['created_at']) ?? date('Y-m-d H:i:s');
     }
 
     // public function login(): bool {}
@@ -88,9 +88,9 @@ abstract class User {
 class BasicUser extends User {
     private int $uploadCount;
 
-    public function __construct(string $username, string $email, string $password, int $uploadCount = 0) {
-        parent::__construct($username, $email, $password);
-        $this->uploadCount = $uploadCount;
+    public function __construct(array $data) {
+        parent::__construct($data);
+        $this->uploadCount = $data['upload_count'] ?? 0;
     }
 
     // Getters & Setters
@@ -108,7 +108,7 @@ class BasicUser extends User {
     }
 
     public function canUploadPhoto() : bool {
-        return $this->uploadCount < 11 ;
+        return $this->uploadCount < 10 ;
     }
 
     public function resetCounter(): void {
@@ -121,9 +121,9 @@ class ProUser extends User {
     private DateTime $subscriptionStart;
     private DateTime $subscriptionEnd;
 
-    public function __construct(string $username, string $email, string $password, DateTime $start) {
-        parent::__construct($username, $email, $password);
-        $this->subscriptionStart = $start;
+    public function __construct(array $data) {
+        parent::__construct($data);
+        $this->subscriptionStart = $data['subscription_start'];
         $this->subscriptionEnd = clone $this->subscriptionStart;
         $this->subscriptionEnd->add(new DateInterval('P30D'));
     }
@@ -158,9 +158,9 @@ class ProUser extends User {
 class Moderator extends User {
     protected string $level = 'senior';
 
-    public function __construct(string $username, string $email, string $password, string $level) {
-        parent::__construct($username, $email, $password);
-        $this->level = $level;
+    public function __construct(array $data) {
+        parent::__construct($data);
+        $this->level = $data['level'];
     }
 
     // Getters & Setters
@@ -212,9 +212,23 @@ class Moderator extends User {
 class Admin extends User {
     private bool $isSuper;
 
-    public function __construct(string $username, string $email, string $password, bool $isSuper = false) {
-        parent::__construct($username, $email, $password);
-        $this->isSuper = $isSuper;
+    public function __construct(array $data) {
+        parent::__construct($data);
+        $this->isSuper = $data['is_super'];
+    }
+
+    // Getters & Setters
+
+    public function getIsSuper() : bool {
+        return $this->isSuper;
+    }
+
+    public function setIsSuper(bool $status) : void {
+        $this->isSuper = $status;
+    }
+
+    public function manageModerator(Moderator $mod, string $level) : void {
+        $mod->setlevel($level);
     }
 
     public function canCreatePrivateAlbum(): bool {
