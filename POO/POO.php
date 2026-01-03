@@ -5,8 +5,8 @@ abstract class User {
     protected string $username;
     protected string $email;
     protected string $password;
-    protected string $createdAt;
-    protected string $lastLogin;
+    protected DateTime $createdAt;
+    protected DateTime $lastLogin;
     protected string $bio;
     protected string $profilePicture;
 
@@ -64,11 +64,11 @@ abstract class User {
         $this->profilePicture = $path;
     }
 
-    public function getCreatedAt(): string {
+    public function getCreatedAt(): DateTime {
         return $this->createdAt;
     }
 
-    public function getLastLogin(): string {
+    public function getLastLogin(): DateTime {
         return $this->lastLogin;
     }
 
@@ -82,6 +82,7 @@ abstract class User {
     }
 
     abstract public function canCreatePrivateAlbum(): bool;
+    abstract public function canUploadPhoto(): bool;
 }
 
 class BasicUser extends User {
@@ -91,6 +92,8 @@ class BasicUser extends User {
         parent::__construct($username, $email, $password);
         $this->uploadCount = $uploadCount;
     }
+
+    // Getters & Setters
 
     public function getUploadCount(): int {
         return $this->uploadCount;
@@ -124,8 +127,11 @@ class ProUser extends User {
         $this->subscriptionEnd = $end;
     }
 
-    
     public function canCreatePrivateAlbum(): bool {
+        return true ;
+    }
+
+    public function canUploadPhoto() : bool {
         return true ;
     }
 }
@@ -142,6 +148,10 @@ class Moderator extends User {
     public function canCreatePrivateAlbum(): bool {
         return true ;
     }
+
+    public function canUploadPhoto() : bool {
+        return true ;
+    }
 }
 
 
@@ -154,6 +164,10 @@ class Admin extends User {
     }
 
     public function canCreatePrivateAlbum(): bool {
+        return true ;
+    }
+
+    public function canUploadPhoto() : bool {
         return true ;
     }
 }
