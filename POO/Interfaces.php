@@ -29,4 +29,18 @@ interface PhotoRepositoryInterface {
     public function archive(int $id): bool;
 }
 
+interface AlbumRepositoryInterface {
+
+    public function findById(int $id) : ?Album;
+
+    public function findPublic() : array;
+
+    public function findUserAlbums(int $userId) : array;
+
+    public function addPhotoToAlbum(int $id_photo , int $albumId) : bool;
+
+    public function removePhotoFromAlbum(int $id_photo , int $albumId) : bool;
+
+    public function save(Album $album) : bool ;
+}
 ?>
