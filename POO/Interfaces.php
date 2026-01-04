@@ -43,4 +43,18 @@ interface AlbumRepositoryInterface {
 
     public function save(Album $album) : bool ;
 }
+
+interface CommentRepositoryInterface {
+
+    public function findById(int $id): ?Comment;
+
+    public function findByPhoto(int $photoId): array;
+
+    public function save(Comment $comment): bool;
+
+    public function delete(int $id): bool;
+
+    public function getReplies(int $parentId): array;
+}
+
 ?>
