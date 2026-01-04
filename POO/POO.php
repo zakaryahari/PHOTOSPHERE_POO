@@ -306,11 +306,20 @@ class Photo {
         return $this->userId; 
     }
 
-    public function setTitle(string $title): void {}
-    public function setState(string $state): void {}
+    public function setTitle(string $title): void {
+        $this->title = $title;
+    }
+    public function setState(string $state): void {
+        $this->state = $state;
+    }
 
 
-    public function isPublished(): bool {}
+    public function isPublished(): bool {
+        if ($this->state == 'published') {
+            return true;
+        }
+        return false;
+    }
 }
 
 class Album {
@@ -355,16 +364,23 @@ class Album {
         return $this->createdAt; 
     }
 
-
-    public function setName(string $name): void { }
-    public function setIsPublic(bool $status): void { }
+    public function setName(string $name): void { 
+        $this->name = $name;
+    }
+    public function setIsPublic(bool $status): void { 
+        $this->isPublic = $status;
+    }
 
 
     public function canAccess(User $user): bool {
-        if ($user->getId() == $this->userId) {
+        if (!$this->isPublic) {
+            if ($user->getId() == $this->userId) {
+                return true;
+            }
+            return false;
+        }else{
             return true;
         }
-        return false;
     }
 }
 
@@ -404,7 +420,9 @@ class Comment {
         return $this->createdAt; 
     }
 
-    public function setContent(string $content): void { }
+    public function setContent(string $content): void {  
+        $this->content = $content;
+    }
 
     public function isReply(): bool { }
 
@@ -415,6 +433,9 @@ class Comment {
         if ($user->getId() == $this->userId) {
             return true;
         }
+        if ($user instanceof Admin) {
+            return true;
+        }        
         return false;
     }
 }
@@ -434,7 +455,9 @@ class Tag {
     public function getName(): string { 
         return $this->name; 
     }
-    public function setName(string $name): void { }
+    public function setName(string $name): void { 
+        $this->name = $name;
+    }
 }
 
 ?>
