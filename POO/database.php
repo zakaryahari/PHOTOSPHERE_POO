@@ -1,7 +1,7 @@
 <?php 
 class Database {
     private $host = "localhost";
-    private $db_name = "photosphere";
+    private $db_name = "photoshere";
     private $username = "root";
     private $password = "";
     private $port = "3307";
@@ -14,7 +14,7 @@ class Database {
             $dsn = "mysql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name;
             $this->conn = new PDO($dsn, $this->username, $this->password);
             
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ATTR_ERRMODE_EXCEPTION);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
         } catch(PDOException $e) {
             die("Connection failed: " . $e->getMessage());

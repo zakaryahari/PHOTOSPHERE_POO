@@ -15,7 +15,7 @@ class UserRepository implements UserRepositoryInterface {
         $sql = "select * from User where id_user = :id";
 
         $query = $this->db->getConnection()->prepare($sql);
-        $query->bindParam(":id" , $id);
+        $query->bindValue(":id" , $id);
 
         if($query->execute()) {
             $row = $query->fetch(PDO::FETCH_ASSOC);
@@ -48,7 +48,7 @@ class UserRepository implements UserRepositoryInterface {
         $sql = "select * from User where email = :email";
 
         $query = $this->db->getConnection()->prepare($sql);
-        $query->bindParam(":email" , $email);
+        $query->bindValue(":email" , $email);
 
         if($query->execute()) {
             $row = $query->fetch(PDO::FETCH_ASSOC);
@@ -80,7 +80,7 @@ class UserRepository implements UserRepositoryInterface {
     public function getExtraData(string $table , int $id) {
         $sql = "select * from $table where id_user = :id" ;
         $row = $this->db->getConnection()->prepare($sql);
-        $row->bindParam(":id" , $id);
+        $row->bindValue(":id" , $id);
         $row->execute();
         return $row->fetch(PDO::FETCH_ASSOC);
     }
@@ -96,13 +96,13 @@ class UserRepository implements UserRepositoryInterface {
             if ($user instanceof ProUser) $role = 'pro';
             if ($user instanceof Moderator) $role = 'moderator';
 
-            $query->bindParam(":username",$user->getUsername());
-            $query->bindParam(":email",$user->getEmail());
-            $query->bindParam(":password",$user->getPassword());
-            $query->bindParam(":bio",$user->getBio());
-            $query->bindParam(":status" , $user->getStatus());
-            $query->bindParam(":pp",$user->getProfilePicture());
-            $query->bindParam(":role",$role);
+            $query->bindValue(":username",$user->getUsername());
+            $query->bindValue(":email",$user->getEmail());
+            $query->bindValue(":password",$user->getPassword());
+            $query->bindValue(":bio",$user->getBio());
+            $query->bindValue(":status" , $user->getStatus());
+            $query->bindValue(":pp",$user->getProfilePicture());
+            $query->bindValue(":role",$role);
 
             $query->execute();
             $Id_Inserted = $this->db->getConnection()->lastInsertId(); 
@@ -110,82 +110,83 @@ class UserRepository implements UserRepositoryInterface {
             if ($user instanceof Admin) {
                 $sql_role = "INSERT INTO Admin (id_user,is_super) values (:id,:is_super)";
                 $query_role = $this->db->getConnection()->prepare($sql_role);
-                $query_role->bindParam(":id",$Id_Inserted);
-                $query_role->bindParam(":is_super",$user->getIsSuper());
+                $query_role->bindValue(":id",$Id_Inserted);
+                $query_role->bindValue(":is_super",$user->getIsSuper());
                 $query_role->execute();
             }
             if ($user instanceof BasicUser) {
                 $sql_role = "INSERT INTO Basic_User (id_user,upload_count) values (:id,:upload_count)";
                 $query_role = $this->db->getConnection()->prepare($sql_role);
-                $query_role->bindParam(":id",$Id_Inserted);
-                $query_role->bindParam(":upload_count",$user->getUploadCount());
+                $query_role->bindValue(":id",$Id_Inserted);
+                $query_role->bindValue(":upload_count",$user->getUploadCount());
                 $query_role->execute();
             }
             if ($user instanceof ProUser) {
                 $sql_role = "INSERT INTO Pro_User (id_user,subscription_start,subscription_end) values (:id,:subscription_start,:subscription_end)";
                 $query_role = $this->db->getConnection()->prepare($sql_role);
-                $query_role->bindParam(":id",$Id_Inserted);
-                $query_role->bindParam(":subscription_start",$user->getSubscriptionStart()->format('Y-m-d'));
-                $query_role->bindParam(":subscription_end",$user->getSubscriptionEnd()->format('Y-m-d'));
+                $query_role->bindValue(":id",$Id_Inserted);
+                $query_role->bindValue(":subscription_start",$user->getSubscriptionStart()->format('Y-m-d'));
+                $query_role->bindValue(":subscription_end",$user->getSubscriptionEnd()->format('Y-m-d'));
                 $query_role->execute();
             }
             if ($user instanceof Moderator) {
                 $sql_role = "INSERT INTO Moderator (id_user,level) values (:id,:level)";
                 $query_role = $this->db->getConnection()->prepare($sql_role);
-                $query_role->bindParam(":id",$Id_Inserted);
-                $query_role->bindParam(":level",$user->getlevel());
+                $query_role->bindValue(":id",$Id_Inserted);
+                $query_role->bindValue(":level",$user->getlevel());
                 $query_role->execute();
             }
-            
+            return true;
         }
         if ($user->getId() > 0) {
             //update
             $sql_update = "UPDATE User set bio = :bio , profile_picture  = :pp ,status = :status ,password_hash = :password where id_user = :id";
             $query_update = $this->db->getConnection()->prepare($sql_update);
-            $query_update->bindParam(":bio" , $user->getBio());
-            $query_update->bindParam(":pp" , $user->getProfilePicture());
-            $query_update->bindParam(":status" , $user->getStatus());
-            $query_update->bindParam(":password" , $user->getPassword());
-            $query_update->bindParam(":id" , $user->getId());
+            $query_update->bindValue(":bio" , $user->getBio());
+            $query_update->bindValue(":pp" , $user->getProfilePicture());
+            $query_update->bindValue(":status" , $user->getStatus());
+            $query_update->bindValue(":password" , $user->getPassword());
+            $query_update->bindValue(":id" , $user->getId());
             $query_update->execute();
 
             if ($user instanceof Admin) {
                 $sql_role_update = "UPDATE Admin set is_super = :is_super where id_user = :id";
                 $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
-                $query_role_update->bindParam(":is_user",$user->getIsSuper());
-                $query_role_update->bindParam(":id",$user->getId());
+                $query_role_update->bindValue(":is_user",$user->getIsSuper());
+                $query_role_update->bindValue(":id",$user->getId());
                 $query_role_update->execute();
             }
             if ($user instanceof BasicUser) {
                 $sql_role_update = "UPDATE Basic_User set upload_count = :upload_count where id_user = :id";
                 $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
-                $query_role_update->bindParam(":upload_count",$user->getUploadCount());
-                $query_role_update->bindParam(":id",$user->getId());
+                $query_role_update->bindValue(":upload_count",$user->getUploadCount());
+                $query_role_update->bindValue(":id",$user->getId());
                 $query_role_update->execute();
             }
             if ($user instanceof ProUser) {
                 $sql_role_update = "UPDATE Pro_User set subscription_start = :subscription_start , subscription_end = :subscription_end where id_user = :id";
                 $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
-                $query_role_update->bindParam(":subscription_start",$user->getSubscriptionStart()->format('Y-m-d'));
-                $query_role_update->bindParam(":subscription_end",$user->getSubscriptionEnd()->format('Y-m-d'));
-                $query_role_update->bindParam(":id",$user->getId());
+                $query_role_update->bindValue(":subscription_start",$user->getSubscriptionStart()->format('Y-m-d'));
+                $query_role_update->bindValue(":subscription_end",$user->getSubscriptionEnd()->format('Y-m-d'));
+                $query_role_update->bindValue(":id",$user->getId());
                 $query_role_update->execute();
             }
             if ($user instanceof Moderator) {
                 $sql_role_update = "UPDATE Moderator set level = :level where id_user = :id";
                 $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
-                $query_role_update->bindParam(":level",$user->getlevel());
-                $query_role_update->bindParam(":id",$user->getId());
+                $query_role_update->bindValue(":level",$user->getlevel());
+                $query_role_update->bindValue(":id",$user->getId());
                 $query_role_update->execute();
             }
+            return true;
         }
-        
+        return false;
     }
 
     public function archive(int $id) : bool {
         $sql= "UPDATE User set status = 'archived' where id_user = :id";
         $query_archive = $this->db->getConnection()->prepare($sql);
-        $query_archive->bindParam(":id",$id);
+        $query_archive->bindValue(":id",$id);
         $query_archive->execute(); 
     }
 

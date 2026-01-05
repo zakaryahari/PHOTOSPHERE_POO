@@ -15,11 +15,11 @@ abstract class User {
         $this->id = $data['id_user'];
         $this->username = $data['username'];
         $this->email = $data['email'];
-        $this->password = $data['password'];
+        $this->password = $data['password_hash'];
         $this->status = $data['status'] ?? 'active';
         $this->bio = $data['bio'] ?? null;
         $this->profilePicture = $data['profile_picture'] ?? null;
-        $this->createdAt = new DateTime($data['created_at']) ?? date('Y-m-d H:i:s');
+        $this->createdAt = new DateTime($data['created_at']?? 'now');
     }
 
     // public function login(): bool {}
