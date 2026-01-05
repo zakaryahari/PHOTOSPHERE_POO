@@ -130,3 +130,5 @@ CREATE TABLE Audit_Log (
 );
 
 ALTER TABLE User ADD COLUMN role ENUM('basic', 'pro', 'moderator', 'admin') DEFAULT 'basic';
+
+ALTER TABLE User ADD COLUMN STATUS ENUM('active','archived') DEFAULT 'active';
