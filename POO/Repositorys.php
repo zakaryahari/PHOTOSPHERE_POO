@@ -180,8 +180,15 @@ class UserRepository implements UserRepositoryInterface {
             }
         }
         
-        
     }
+
+    public function archive(int $id) : bool {
+        $sql= "UPDATE User set status = 'archived' where id_user = :id";
+        $query_archive = $this->db->getConnection()->prepare($sql);
+        $query_archive->bindParam(":id",$id);
+        $query_archive->execute(); 
+    }
+
 }
 
 ?>
