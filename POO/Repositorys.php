@@ -244,6 +244,27 @@ class PhotoRepository implements PhotoRepositoryInterface {
         return null;
     }
 
+    public function getLatest(int $limit): array{
+        $sql_lastest = "SELECT * FROM Photo ORDER BY created_at DESC LIMIT :limit";
+
+        $query_lastest = $this->db->getConnection()->prepare($sql_lastest);
+        $query_lastest->bindValue(":limit",$limit, PDO::PARAM_INT);
+
+
+        if($query_lastest->execute()) {
+            $all_photos = $query_lastest->fetchAll(PDO::FETCH_ASSOC);
+            if ($all_photos) {
+                $array_allphotos = [];
+                foreach($all_photos as $photo){
+                    $array_allphotos[] = new Photo($photo);
+                }
+                return $array_allphotos;
+            }
+        }
+        return null;
+    }
+
+
     
 }
 
