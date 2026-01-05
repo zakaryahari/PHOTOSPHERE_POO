@@ -54,7 +54,7 @@ class UserRepository implements UserRepositoryInterface {
     public function save(User $user) : bool {
         if ($user->getId() == 0) {
             //insert
-            $sql = "INSERT INTO User (username, email, password_hash, bio, profile_picture, role) VALUES (:username, :email, :password, :bio, :pp, :role)";
+            $sql = "INSERT INTO User (username, email, password_hash, bio,status, profile_picture, role) VALUES (:username, :email, :password, :bio,:status, :pp, :role)";
             $query = $this->db->getConnection()->prepare($sql);
 
             $role = 'basic';
@@ -66,6 +66,7 @@ class UserRepository implements UserRepositoryInterface {
             $query->bindParam(":email",$user->getEmail());
             $query->bindParam(":password",$user->getPassword());
             $query->bindParam(":bio",$user->getBio());
+            $query->bindParam(":status" , $user->getStatus());
             $query->bindParam(":pp",$user->getProfilePicture());
             $query->bindParam(":role",$role);
 
@@ -105,10 +106,11 @@ class UserRepository implements UserRepositoryInterface {
         }
         if ($user->getId() > 0) {
             //update
-            $sql_update = "UPDATE User set bio = :bio , profile_picture = :pp ,password_hash = :password where id_user = :id";
+            $sql_update = "UPDATE User set bio = :bio , profile_picture  = :pp ,status = :status ,password_hash = :password where id_user = :id";
             $query_update = $this->db->getConnection()->prepare($sql_update);
             $query_update->bindParam(":bio" , $user->getBio());
             $query_update->bindParam(":pp" , $user->getProfilePicture());
+            $query_update->bindParam(":status" , $user->getStatus());
             $query_update->bindParam(":password" , $user->getPassword());
             $query_update->bindParam(":id" , $user->getId());
             $query_update->execute();
@@ -138,11 +140,12 @@ class UserRepository implements UserRepositoryInterface {
             if ($user instanceof Moderator) {
                 $sql_role_update = "UPDATE Moderator set level = :level where id_user = :id";
                 $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
-                $query_role_update->bindParam(":level",$user->getIsSuper());
-                $query_role_update->bindParam(":id",$user->getlevel());
+                $query_role_update->bindParam(":level",$user->getlevel());
+                $query_role_update->bindParam(":id",$user->getId());
                 $query_role_update->execute();
             }
         }
+        
     }
 }
 
