@@ -50,6 +50,61 @@ class UserRepository implements UserRepositoryInterface {
         $row->execute();
         return $row->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function save(User $user) : bool {
+        if ($user->getId() == 0) {
+            //insert
+            $sql = "INSERT INTO User (username, email, password_hash, bio, profile_picture, role) VALUES (:username, :email, :password, :bio, :pp, :role)";
+            $query = $this->db->getConnection()->prepare($sql);
+
+            $role = 'basic';
+            if ($user instanceof Admin) $role = 'admin';
+            if ($user instanceof ProUser) $role = 'pro';
+            if ($user instanceof Moderator) $role = 'moderator';
+
+            $query->bindParam(":username",$user->getUsername());
+            $query->bindParam(":email",$user->getEmail());
+            $query->bindParam(":password",$user->getPassword());
+            $query->bindParam(":bio",$user->getBio());
+            $query->bindParam(":pp",$user->getProfilePicture());
+            $query->bindParam(":role",$role);
+
+            $query->execute();
+            $Id_Inserted = $this->db->getConnection()->lastInsertId(); 
+
+            if ($user instanceof Admin) {
+                $sql_role = "INSERT INTO Admin (id_user,is_super) values (:id,:is_super)";
+                $query_role = $this->db->getConnection()->prepare($sql_role);
+                $query_role->bindParam(":id",$Id_Inserted);
+                $query_role->bindParam(":is_super",$user->getIsSuper());
+                $query_role->execute();
+            }
+            if ($user instanceof BasicUser) {
+                $sql_role = "INSERT INTO Basic_User (id_user,upload_count) values (:id,:upload_count)";
+                $query_role = $this->db->getConnection()->prepare($sql_role);
+                $query_role->bindParam(":id",$Id_Inserted);
+                $query_role->bindParam(":upload_count",$user->getUploadCount());
+                $query_role->execute();
+            }
+            if ($user instanceof ProUser) {
+                $sql_role = "INSERT INTO Pro_User (id_user,subscription_start,subscription_end) values (:id,:subscription_start,:subscription_end)";
+                $query_role = $this->db->getConnection()->prepare($sql_role);
+                $query_role->bindParam(":id",$Id_Inserted);
+                $query_role->bindParam(":subscription_start",$user->getSubscriptionStart()->format('Y-m-d'));
+                $query_role->bindParam(":subscription_end",$user->getSubscriptionEnd()->format('Y-m-d'));
+                $query_role->execute();
+            }
+            if ($user instanceof Moderator) {
+                $sql_role = "INSERT INTO Moderator (id_user,level) values (:id,:level)";
+                $query_role = $this->db->getConnection()->prepare($sql_role);
+                $query_role->bindParam(":id",$Id_Inserted);
+                $query_role->bindParam(":level",$user->getlevel());
+                $query_role->execute();
+            }
+            
+        }
+        
+    }
 }
 
 ?>
