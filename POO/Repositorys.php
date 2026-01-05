@@ -103,7 +103,46 @@ class UserRepository implements UserRepositoryInterface {
             }
             
         }
-        
+        if ($user->getId() > 0) {
+            //update
+            $sql_update = "UPDATE User set bio = :bio , profile_picture = :pp ,password_hash = :password where id_user = :id";
+            $query_update = $this->db->getConnection()->prepare($sql_update);
+            $query_update->bindParam(":bio" , $user->getBio());
+            $query_update->bindParam(":pp" , $user->getProfilePicture());
+            $query_update->bindParam(":password" , $user->getPassword());
+            $query_update->bindParam(":id" , $user->getId());
+            $query_update->execute();
+
+            if ($user instanceof Admin) {
+                $sql_role_update = "UPDATE Admin set is_super = :is_super where id_user = :id";
+                $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
+                $query_role_update->bindParam(":is_user",$user->getIsSuper());
+                $query_role_update->bindParam(":id",$user->getId());
+                $query_role_update->execute();
+            }
+            if ($user instanceof BasicUser) {
+                $sql_role_update = "UPDATE Basic_User set upload_count = :upload_count where id_user = :id";
+                $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
+                $query_role_update->bindParam(":upload_count",$user->getUploadCount());
+                $query_role_update->bindParam(":id",$user->getId());
+                $query_role_update->execute();
+            }
+            if ($user instanceof ProUser) {
+                $sql_role_update = "UPDATE Pro_User set subscription_start = :subscription_start , subscription_end = :subscription_end where id_user = :id";
+                $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
+                $query_role_update->bindParam(":subscription_start",$user->getSubscriptionStart()->format('Y-m-d'));
+                $query_role_update->bindParam(":subscription_end",$user->getSubscriptionEnd()->format('Y-m-d'));
+                $query_role_update->bindParam(":id",$user->getId());
+                $query_role_update->execute();
+            }
+            if ($user instanceof Moderator) {
+                $sql_role_update = "UPDATE Moderator set level = :level where id_user = :id";
+                $query_role_update = $this->db->getConnection()->prepare($sql_role_update);
+                $query_role_update->bindParam(":level",$user->getIsSuper());
+                $query_role_update->bindParam(":id",$user->getlevel());
+                $query_role_update->execute();
+            }
+        }
     }
 }
 
