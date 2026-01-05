@@ -303,6 +303,25 @@ class PhotoRepository implements PhotoRepositoryInterface {
     }
     
 
+    public function findByTag(string $tagName): array {
+        $sql_filterbytag = "SELECT p.* FROM Photo p join Photo_Tags pt on p.id_photo = pt.id_photo join Tag t on pt.id_tag = t.id_tag where t.id_tag = :id_tag AND p.state = 'published' ORDER BY p.created_at DESC";
+
+        $query_filterbytag = $this->db->getConnection()->prepare($sql);
+        $query_filterbytag->bindValue(":tagName", $tagName);
+
+        $photos = [];
+
+        if ($query_filterbytag->execute()) {
+            $rows = $query_filterbytag->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $row) {
+                $photos[] = new Photo($row);
+            }
+        }
+
+        return $photos;
+
+    }
+
     
 }
 
