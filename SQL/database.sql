@@ -10,7 +10,7 @@ CREATE TABLE User (
     password_hash VARCHAR(255) NOT NULL,
     bio TEXT, 
     profile_picture VARCHAR(255), 
-    created_at DATETIME DEFAULT CURRENT_DATE, 
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
     last_login DATETIME 
 );
 
@@ -54,8 +54,8 @@ CREATE TABLE Photo (
     state ENUM('draft', 'published', 'archived') DEFAULT 'draft',
     view_count INT DEFAULT 0,
     published_at DATETIME,
-    created_at DATETIME DEFAULT CURRENT_DATE,
-    updated_at DATETIME ON UPDATE CURRENT_DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     id_user INT NOT NULL,
     FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
@@ -67,8 +67,8 @@ CREATE TABLE Album (
     is_public BOOLEAN DEFAULT TRUE,
     cover_photo_path VARCHAR(255),
     photo_count INT DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_DATE,
-    updated_at DATETIME ON UPDATE CURRENT_DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     id_user INT NOT NULL,
     FOREIGN KEY (id_user) REFERENCES User(id_user) 
 );
@@ -84,8 +84,8 @@ CREATE TABLE Comment (
     id_comment INT PRIMARY KEY AUTO_INCREMENT,
     content TEXT NOT NULL,
     is_edited BOOLEAN DEFAULT FALSE,
-    created_at DATETIME DEFAULT CURRENT_DATE,
-    updated_at DATETIME ON UPDATE CURRENT_DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     id_user INT NOT NULL,
     id_photo INT NOT NULL,
     parent_id INT,
@@ -97,7 +97,7 @@ CREATE TABLE Comment (
 CREATE TABLE Likes (
     id_user INT ,
     id_photo INT,
-    created_at DATETIME DEFAULT CURRENT_DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id_user, id_photo),
     FOREIGN KEY (id_user) REFERENCES User(id_user) ,
     FOREIGN KEY (id_photo) REFERENCES Photo(id_photo) 
@@ -124,7 +124,9 @@ CREATE TABLE Audit_Log (
     action VARCHAR(100) NOT NULL,
     ip_source VARCHAR(45) NOT NULL,
     reason TEXT,
-    created_at DATETIME DEFAULT CURRENT_DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     id_user INT,
     FOREIGN KEY (id_user) REFERENCES User(id_user) ON DELETE SET NULL
 );
+
+ALTER TABLE User ADD COLUMN role ENUM('basic', 'pro', 'moderator', 'admin') DEFAULT 'basic';
