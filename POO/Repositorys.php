@@ -189,6 +189,38 @@ class UserRepository implements UserRepositoryInterface {
         $query_archive->execute(); 
     }
 
+
+    public function getAll() : array {
+        $sql = "SELECT * FROM User";
+
+        $query_allusers = $this->db->getConnection()->execute($sql);
+        // $query_allusers->execute(); 
+        $all_users = $query_allusers->fetchAll(PDO::FETCH_ASSOC);
+
+        $users_array_objects = [];
+        $userobject;
+
+        foreach($all_users as $u){
+            if ($u['role'] == 'admin') {
+                $extra = $this->getExtraData('Admin', $u->getId);
+                $users_array_objects[] = new Admin(array_merge($u, $extra));
+            }
+            if ($u['role'] == 'basic') {
+                $extra = $this->getExtraData('Basic_User', $u->getId);
+                $users_array_objects[] = new BasicUser(array_merge($u, $extra));
+            }
+            if ($u['role'] == 'pro') {
+                $extra = $this->getExtraData('Pro_User', $u->getId);
+                $users_array_objects[] = new ProUser(array_merge($u, $extra));
+            }
+            if ($u['role'] == 'moderator') {
+                $extra = $this->getExtraData('Moderator', $u->getId);
+                $users_array_objects[] = new Moderator(array_merge($u, $extra));
+            }
+        }
+    }
+
+
 }
 
 ?>
