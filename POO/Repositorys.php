@@ -10,6 +10,40 @@ class UserRepository implements UserRepositoryInterface {
         $this->db = $conn;
     }
 
+
+    public function findById(int $id) : User {
+        $sql = "select * from User where id_user = :id";
+
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindParam(":id" , $id);
+
+        if($query->execute()) {
+            $row = $query->fetch(PDO::FETCH_ASSOC);
+            if (!$row) return null;
+
+            $id = $row['id_user'];
+
+            if ($row['role'] === 'admin') {
+                $extra = $this->getExtraData('Admin', $id);
+                return new Admin(array_merge($row, $extra));
+            } 
+            
+            if ($row['role'] === 'pro') {
+                $extra = $this->getExtraData('Pro_User', $id);
+                return new ProUser(array_merge($row, $extra));
+            }
+
+            if ($row['role'] === 'basic') {
+                $extra = $this->getExtraData('Basic_User', $id);
+                return new BasicUser(array_merge($row, $extra));
+            }
+
+
+            return null;
+        }
+        return false;
+    }
+
     public function findByEmail(string $email) : User {
         $sql = "select * from User where email = :email";
 
@@ -145,6 +179,7 @@ class UserRepository implements UserRepositoryInterface {
                 $query_role_update->execute();
             }
         }
+        
         
     }
 }
