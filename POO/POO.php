@@ -46,6 +46,16 @@ abstract class User {
         $this->email = $email;
     }
 
+    public function getPassword(): string {
+        return $this->password;
+    }
+
+    public function setPassword(string $plainPassword): void {
+        if (strlen($plainPassword) >= 8) {
+            $this->password = password_hash($plainPassword, PASSWORD_BCRYPT);
+        }
+    }
+
     public function getBio(): ?string {
         return $this->bio;
     }
