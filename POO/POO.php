@@ -7,6 +7,7 @@ abstract class User {
     protected string $password;
     protected DateTime $createdAt;
     protected DateTime $lastLogin;
+    protected string $status;
     protected ?string $bio;
     protected ?string $profilePicture;
 
@@ -15,6 +16,7 @@ abstract class User {
         $this->username = $data['username'];
         $this->email = $data['email'];
         $this->password = $data['password'];
+        $this->status = $data['status'] ?? 'active';
         $this->bio = $data['bio'] ?? null;
         $this->profilePicture = $data['profile_picture'] ?? null;
         $this->createdAt = new DateTime($data['created_at']) ?? date('Y-m-d H:i:s');
@@ -54,6 +56,21 @@ abstract class User {
         if (strlen($plainPassword) >= 8) {
             $this->password = password_hash($plainPassword, PASSWORD_BCRYPT);
         }
+    }
+
+    public function getStatus(): string {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): void {
+        $allowed = ['active', 'archived'];
+        if (in_array($status, $allowed)) {
+            $this->status = $status;
+        }
+    }
+
+    public function isArchived(): bool {
+        return $this->status === 'archived';
     }
 
     public function getBio(): ?string {
