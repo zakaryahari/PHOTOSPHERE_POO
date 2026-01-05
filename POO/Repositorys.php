@@ -265,6 +265,44 @@ class PhotoRepository implements PhotoRepositoryInterface {
     }
 
 
+    public function save(Photo $photo): bool {
+        // INSERT
+        if ($photo->getId() == 0) {
+            $sql_insert = "INSERT INTO Photo (title, description, file_name, file_size, mime_type, dimensions, state, id_user) 
+                        VALUES (:title, :description, :file_name, :file_size, :mime_type, :dimensions, :state, :id_user)";
+            
+            $query_insert = $this->db->getConnection()->prepare($sql_insert);
+            
+            $query_insert->bindValue(":title", $photo->getTitle());
+            $query_insert->bindValue(":description", $photo->getDescription());
+            $query_insert->bindValue(":file_name", $photo->getFileName());
+            $query_insert->bindValue(":file_size", $photo->getFileSize(), PDO::PARAM_INT);
+            $query_insert->bindValue(":mime_type", $photo->getMimeType());
+            $query_insert->bindValue(":dimensions", $photo->getDimensions());
+            $query_insert->bindValue(":state", $photo->getState());
+            $query_insert->bindValue(":id_user", $photo->getUserId(), PDO::PARAM_INT);
+
+            return $query_insert->execute();
+        }
+
+        // UPDATE
+        if ($photo->getId() > 0) {
+            $sql_update = "UPDATE Photo SET title = :title, description = :description, state = :state WHERE id_photo = :id";
+            
+            $query_update = $this->db->getConnection()->prepare($sql_update);
+            
+            $query_update->bindValue(":title", $photo->getTitle());
+            $query_update->bindValue(":description", $photo->getDescription());
+            $query_update->bindValue(":state", $photo->getState());
+            $query_update->bindValue(":id", $photo->getId(), PDO::PARAM_INT);
+
+            return $query_update->execute();
+        }
+
+        return false;
+    }
+    
+
     
 }
 
