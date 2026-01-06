@@ -356,4 +356,25 @@ class PhotoRepository implements PhotoRepositoryInterface {
     }
 }
 
+
+class AlbumRepository implements AlbumRepositoryInterface {
+    private Database $db;
+
+    public function __construct(Database $conn) {
+        $this->db = $conn;
+    }
+
+    public function findById(int $id): ?Album {
+        $sql = "SELECT * FROM Album WHERE id_album = :id";
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":id", $id, PDO::PARAM_INT);
+
+        if ($query->execute()) {
+            $row = $query->fetch(PDO::FETCH_ASSOC);
+            return $row ? new Album($row) : null;
+        }
+        return null;
+    }
+
+}
 ?>
