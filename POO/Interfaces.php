@@ -18,7 +18,7 @@ interface PhotoRepositoryInterface {
 
     public function findById(int $id): ?Photo;
 
-    public function getLatest(int $limit, int $offset): array;
+    public function getLatest(int $limit): array;
 
     public function save(Photo $photo): bool;
 
@@ -55,6 +55,19 @@ interface CommentRepositoryInterface {
     public function delete(int $id): bool;
 
     public function getReplies(int $parentId): array;
+}
+
+interface Taggable {
+
+    public function addTag(string $tag): void ;
+
+    public function removeTag(string $tag): void;
+
+    public function getTags(): array ;
+
+    public function hasTag(string $tag): bool;
+
+    public function clearTags(): void;
 }
 
 ?>
