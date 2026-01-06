@@ -420,5 +420,42 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return false;
     }
 
+    public function removePhotoFromAlbum(int $id_photo, int $albumId): bool {
+        $sql = "DELETE FROM Photo_Albums WHERE id_photo = :id_p AND id_album = :id_a";
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":id_p", $id_photo, PDO::PARAM_INT);
+        $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+
+        if ($query->execute()) {
+            $sql_update = "UPDATE Album SET photo_count = photo_count - 1 WHERE id_album = :id_a";
+            $update = $this->db->getConnection()->prepare($sql_update);
+            $update->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+            return $update->execute();
+        }
+        return false;
+    }
+
+    public function save(Album $album): bool {
+        if ($album->getId() == 0) {
+            $sql = "INSERT INTO Album (name, description, is_public, id_user) VALUES (:name, :desc, :public, :user)";
+            $query = $this->db->getConnection()->prepare($sql);
+            $query->bindValue(":name", $album->getName());
+            $query->bindValue(":desc", $album->getDescription());
+            $query->bindValue(":public", $album->getIsPublic(), PDO::PARAM_BOOL);
+            $query->bindValue(":user", $album->getUserId(), PDO::PARAM_INT);
+            return $query->execute();
+        }
+
+        if ($album->getId() > 0) {
+            $sql = "UPDATE Album SET name = :name, description = :desc, is_public = :public WHERE id_album = :id";
+            $query = $this->db->getConnection()->prepare($sql);
+            $query->bindValue(":name", $album->getName());
+            $query->bindValue(":desc", $album->getDescription());
+            $query->bindValue(":public", $album->getIsPublic(), PDO::PARAM_BOOL);
+            $query->bindValue(":id", $album->getId(), PDO::PARAM_INT);
+            return $query->execute();
+        }
+        return false;
+    }
 }
 ?>
