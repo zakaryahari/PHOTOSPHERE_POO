@@ -345,7 +345,15 @@ class PhotoRepository implements PhotoRepositoryInterface {
     }
 
 
-    
+    public function archive(int $id): bool {
+
+        $sql = "UPDATE Photo SET state = 'archived' WHERE id_photo = :id";
+        
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }
 
 ?>
