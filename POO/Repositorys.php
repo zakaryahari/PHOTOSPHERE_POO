@@ -322,6 +322,29 @@ class PhotoRepository implements PhotoRepositoryInterface {
 
     }
 
+    public function search(string $query): array {
+
+        $sql = "SELECT * FROM Photo WHERE (title LIKE :search OR description LIKE :search) AND state = 'published'";
+
+        $query_search = $this->db->getConnection()->prepare($sql);
+        
+
+        $searchTerm = "%" . $query . "%";
+        $query_search->bindValue(":search", $searchTerm);
+
+        $results = [];
+
+        if ($query_search->execute()) {
+            $rows = $query_search->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $row) {
+                $results[] = new Photo($row);
+            }
+        }
+
+        return $results;
+    }
+
+
     
 }
 
