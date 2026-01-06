@@ -376,5 +376,19 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return null;
     }
 
+    public function findPublic(): array {
+        $sql = "SELECT * FROM Album WHERE is_public = 1 ORDER BY created_at DESC";
+        $query = $this->db->getConnection()->prepare($sql);
+        
+        $albums = [];
+        if ($query->execute()) {
+            $rows = $query->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $row) {
+                $albums[] = new Album($row);
+            }
+        }
+        return $albums;
+    }
+
 }
 ?>
