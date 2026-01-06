@@ -405,5 +405,20 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return $albums;
     }
 
+    public function addPhotoToAlbum(int $id_photo, int $albumId): bool {
+        $sql = "INSERT INTO Photo_Albums (id_photo, id_album) VALUES (:id_p, :id_a)";
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":id_p", $id_photo, PDO::PARAM_INT);
+        $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+
+        if ($query->execute()) {
+            $sql_update = "UPDATE Album SET photo_count = photo_count + 1 WHERE id_album = :id_a";
+            $update = $this->db->getConnection()->prepare($sql_update);
+            $update->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+            return $update->execute();
+        }
+        return false;
+    }
+
 }
 ?>
