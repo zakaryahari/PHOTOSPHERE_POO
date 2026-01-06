@@ -390,5 +390,20 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return $albums;
     }
 
+    public function findUserAlbums(int $userId): array {
+        $sql = "SELECT * FROM Album WHERE id_user = :userId ORDER BY created_at DESC";
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":userId", $userId, PDO::PARAM_INT);
+
+        $albums = [];
+        if ($query->execute()) {
+            $rows = $query->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $row) {
+                $albums[] = new Album($row);
+            }
+        }
+        return $albums;
+    }
+
 }
 ?>
