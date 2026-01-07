@@ -37,9 +37,9 @@ interface AlbumRepositoryInterface {
 
     public function findUserAlbums(int $userId) : array;
 
-    public function addPhotoToAlbum(int $id_photo , int $albumId) : bool;
+    public function addPhotoToAlbum(int $id_photo, int $albumId, int $userId) : bool;
 
-    public function removePhotoFromAlbum(int $id_photo , int $albumId) : bool;
+    public function removePhotoFromAlbum(int $id_photo, int $albumId, int $userId) : bool;
 
     public function save(Album $album) : bool ;
 }
@@ -90,7 +90,7 @@ interface Likeable {
     public function isLikedBy(int $userId): bool;
 
     public function getLikeCount(): int;
-    
+
     public function getLikedBy(): array;
 }
 

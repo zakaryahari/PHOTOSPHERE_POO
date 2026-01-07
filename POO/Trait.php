@@ -113,4 +113,5 @@ trait CommentableTrait {
         return false;
     }
 }
+
 ?>

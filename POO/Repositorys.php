@@ -448,7 +448,7 @@ class AlbumRepository implements AlbumRepositoryInterface {
     //     return false;
     // }
 
-    public function addPhotoToAlbum(int $id_photo, int $albumId , int $userId): bool {
+    public function addPhotoToAlbum(int $id_photo, int $albumId, int $userId): bool {
         
         $sql_check_album_exist = "SELECT id_user, photo_count FROM Album WHERE id_album = :id";
         $query_check_album_exist = $this->db->getConnection()->prepare($sql_check_album_exist);

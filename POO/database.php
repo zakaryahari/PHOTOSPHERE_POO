@@ -8,7 +8,6 @@ class Database {
     private static $instance = null;
     private $conn;
 
-
     private function __construct() {
         try {
             $dsn = "mysql:host=" . $this->host . ";port=" . $this->port . ";dbname=" . $this->db_name;
@@ -31,4 +30,6 @@ class Database {
     public function getConnection() {
         return $this->conn;
     }
+
+    
 }

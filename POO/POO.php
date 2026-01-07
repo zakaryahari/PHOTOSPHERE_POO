@@ -1,4 +1,7 @@
 <?php
+require_once 'Interfaces.php';
+
+require_once 'Trait.php';
 
 abstract class User {
     protected int $id;
@@ -280,8 +283,8 @@ class Photo implements Taggable, Likeable, Commentable {
     protected int $userId;
     private bool $isPublic;
     protected int $viewCount;
-    private int $likeCount;
-    private int $commentCount;
+    // private int $likeCount;
+    // private int $commentCount;
 
     public function __construct(array $data) {
         $this->id = $data['id_photo'];
@@ -295,8 +298,8 @@ class Photo implements Taggable, Likeable, Commentable {
         $this->viewCount = $data['view_count'] ?? 0;
         $this->userId = $data['id_user'];
         $this->likeCount = $data['like_count'] ?? 0;
-        $this->viewCount = $data['view_count'] ?? 0;
-        $this->commentCount = $data['comment_count'] ?? 0;
+        // $this->viewCount = $data['view_count'] ?? 0;
+        // $this->commentCount = $data['comment_count'] ?? 0;
         $this->initializeTimestamps();
     }
 
