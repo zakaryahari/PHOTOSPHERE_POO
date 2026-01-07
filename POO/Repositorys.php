@@ -622,6 +622,30 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return false;
     }
 
+    public function getAlbumWithPhotos(int $albumId, int $userId): ?array {
+        $sql_check = "SELECT * FROM Album WHERE id_album = :id_a";
+        $query_check = $this->db->getConnection()->prepare($sql_check);
+        $query_check->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+        $query_check->execute();
+        $album = $query_check->fetch(PDO::FETCH_ASSOC);
+
+        if ($album) {
+            if ($album['is_public'] == 1 || $album['id_user'] == $userId) {
+                $sql = "SELECT a.*, p.id_photo, p.title as photo_title, p.file_name 
+                        FROM Album a 
+                        LEFT JOIN Photo_Albums pa ON a.id_album = pa.id_album
+                        LEFT JOIN Photo p ON pa.id_photo = p.id_photo
+                        WHERE a.id_album = :id_a";
+                
+                $query = $this->db->getConnection()->prepare($sql);
+                $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+                $query->execute();
+                return $query->fetchAll(PDO::FETCH_ASSOC);
+            }
+        }
+        return null;
+    }
+
     
 }
 ?>
