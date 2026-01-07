@@ -535,7 +535,92 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return false;
     }
 
+    public function save(Album $album): bool {
+        if ($album->getId() == 0) {
 
+            $sql_check_album_exist = "SELECT * FROM Album WHERE name = :name AND id_user = :id";
+            $query_check_album_exist = $this->db->getConnection()->prepare($sql_check_album_exist);
+            $query_check_album_exist->bindValue(":name" , $album->getName());
+            $query_check_album_exist->bindValue(":id" , $album->getUserId(),PDO::PARAM_INT);
+            $query_check_album_exist->execute();
+            $result_check_album_exist = $query_check_album_exist->fetch(PDO::FETCH_ASSOC);
+
+            // $is_pub = true;
+            if (count($result_check_album_exist) == 0) {
+                $is_pub = (bool) $album->getIsPublic();
+
+                if ($is_pub == false) {
+                    $sql_get_user = "SELECT role FROM user where id_user = :id";
+                    $query_get_user = $this->db->getConnection()->prepare($sql_get_user);
+                    $query_get_user->bindValue(":id" , $album->getUserId(),PDO::PARAM_INT);
+                    $query_get_user->execute();
+                    $result_get_user = $query_get_user->fetch(PDO::FETCH_ASSOC);
+                    if ($result_get_user && in_array($result_get_user['role'], ['pro', 'moderator', 'admin'])) {
+                        $is_pub = false;
+                    }
+                    else{
+                        $is_pub = true;
+                    }
+                }
+                try {
+                    $this->db->getConnection()->beginTransaction();
+
+                        $sql = "INSERT INTO Album (name, description, is_public, id_user) VALUES (:name, :desc, :public, :user)";
+                        $query = $this->db->getConnection()->prepare($sql);
+                        $query->bindValue(":name", $album->getName());
+                        $query->bindValue(":desc", $album->getDescription());
+                        $query->bindValue(":public", $is_pub, PDO::PARAM_BOOL);
+                        $query->bindValue(":user", $album->getUserId(), PDO::PARAM_INT);
+                        
+                        $query->execute();   
+                        $this->db->getConnection()->commit();
+
+                    return true;          
+                } catch (Throwable $e) {
+                    $this->db->getConnection()->rollback();
+                }
+            }
+        }
+
+        if ($album->getId() > 0) {
+        
+            $is_pub = (bool) $album->getIsPublic();
+
+            if ($is_pub == false) {
+                $sql_get_user = "SELECT role FROM user where id_user = :id";
+                $query_get_user = $this->db->getConnection()->prepare($sql_get_user);
+                $query_get_user->bindValue(":id" , $album->getUserId(),PDO::PARAM_INT);
+                $query_get_user->execute();
+                $result_get_user = $query_get_user->fetch(PDO::FETCH_ASSOC);
+                if (in_array($result_get_user['role'], ['pro', 'moderator', 'admin'])) {
+                    $is_pub = false;
+                }
+                else{
+                    $is_pub = true;
+                }
+            }
+            try {
+                $this->db->getConnection()->beginTransaction();
+
+                $sql = "UPDATE Album SET name = :name, description = :desc, is_public = :public WHERE id_album = :id";
+                $query = $this->db->getConnection()->prepare($sql);
+                $query->bindValue(":name", $album->getName());
+                $query->bindValue(":desc", $album->getDescription());
+                $query->bindValue(":public", $album->getIsPublic(), PDO::PARAM_BOOL);
+                $query->bindValue(":id", $album->getId(), PDO::PARAM_INT);
+
+                $query->execute();   
+                $this->db->getConnection()->commit();
+
+                return true;          
+            } catch (Throwable $e) {
+                $this->db->getConnection()->rollback();
+            }
+            
+        }
+
+        return false;
+    }
 
     
 }
