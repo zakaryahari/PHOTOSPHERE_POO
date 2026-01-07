@@ -132,3 +132,55 @@ CREATE TABLE Audit_Log (
 ALTER TABLE User ADD COLUMN role ENUM('basic', 'pro', 'moderator', 'admin') DEFAULT 'basic';
 
 ALTER TABLE User ADD COLUMN status ENUM('active','archived') DEFAULT 'active';
+
+ALTER TABLE Photo ADD COLUMN like_count INT DEFAULT 0;
+
+ALTER TABLE Photo ADD COLUMN comment_count INT DEFAULT 0;
+
+
+-- -- 1. Insert into User (The Parent)
+-- INSERT INTO User (id_user, username, email, password_hash, bio, role, status) VALUES 
+-- (1, 'zak_admin', 'admin@photosphere.ma', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator.', 'admin', 'active'),
+-- (2, 'morocco_mod', 'mod@photosphere.ma', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Content Moderator.', 'moderator', 'active'),
+-- (3, 'pro_photographer', 'pro@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Professional Photographer.', 'pro', 'active'),
+-- (4, 'hobby_user', 'hobby@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'I love landscape photos.', 'basic', 'active'),
+-- (5, 'old_account', 'old@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'This user is archived.', 'basic', 'archived');
+
+-- -- 2. Insert into Specific Role Tables (The Children)
+-- INSERT INTO Admin (id_user, is_super) VALUES (1, TRUE);
+-- INSERT INTO Moderator (id_user, level) VALUES (2, 'lead');
+-- INSERT INTO Pro_User (id_user, subscription_start, subscription_end) VALUES (3, '2026-01-01 10:00:00', '2027-01-01 10:00:00');
+-- INSERT INTO Basic_User (id_user, upload_count) VALUES (4, 2), (5, 8);
+
+-- -- 3. Insert Albums
+-- INSERT INTO Album (id_album, name, description, is_public, id_user) VALUES 
+-- (1, 'Marrakech Streets', 'Photos of the red city.', TRUE, 3),
+-- (2, 'Secret Projects', 'Not for public eyes.', FALSE, 1);
+
+-- -- 4. Insert Photos
+-- INSERT INTO Photo (id_photo, title, file_name, file_size, mime_type, dimensions, state, id_user) VALUES 
+-- (1, 'Koutoubia Mosque', 'koutoubia.jpg', 2048000, 'image/jpeg', '1920x1080', 'published', 3),
+-- (2, 'Majorelle Garden', 'majorelle.png', 3500000, 'image/png', '2048x2048', 'published', 3),
+-- (3, 'Draft Photo', 'draft1.jpg', 1024000, 'image/jpeg', '800x600', 'draft', 4);
+
+-- -- 5. Insert Tags
+-- INSERT INTO Tag (id_tag, name, slug) VALUES (1, 'Nature', 'nature'), (2, 'City', 'city');
+
+-- -- 6. Connect Photos to Tags & Albums
+-- INSERT INTO Photo_Tags (id_photo, id_tag) VALUES (1, 2), (2, 1);
+-- INSERT INTO Photo_Albums (id_photo, id_album) VALUES (1, 1), (2, 1);
+
+-- -- 7. Social Interactions
+-- INSERT INTO Likes (id_user, id_photo) VALUES (4, 1), (2, 1);
+-- INSERT INTO Comment (content, id_user, id_photo, parent_id) VALUES 
+-- ('Beautiful shot!', 4, 1, NULL),
+-- ('What lens did you use?', 2, 1, NULL);
+
+-- -- Threaded reply
+-- INSERT INTO Comment (content, id_user, id_photo, parent_id) VALUES 
+-- ('I used a 35mm f1.4.', 3, 1, 2);
+
+-- -- 8. Audit Log
+-- INSERT INTO Audit_Log (action, ip_source, reason, id_user) VALUES 
+-- ('LOGIN', '192.168.1.1', 'Standard login', 1),
+-- ('ARCHIVE_USER', '192.168.1.1', 'User requested deletion', 5);
