@@ -678,4 +678,28 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return false;
     }
 }
+
+class TagRepository implements TagRepositoryInterface {
+    private Database $db;
+
+    public function __construct() {
+        $this->db = Database::getInstance();
+    }
+
+    public function getPopularTags(int $limit = 50): array {
+        $sql = "SELECT t.name, COUNT(pt.id_photo) as tag_count 
+                FROM Tag t 
+                JOIN Photo_Tags pt ON t.id_tag = pt.id_tag 
+                GROUP BY t.id_tag 
+                ORDER BY tag_count DESC 
+                LIMIT :lim";
+        
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":lim", $limit, PDO::PARAM_INT);
+        $query->execute();
+        
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+}
 ?>
