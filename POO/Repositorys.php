@@ -646,6 +646,36 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return null;
     }
 
-    
+    public function deleteAlbum(int $albumId, int $userId): bool {
+        $sql_check = "SELECT id_user FROM Album WHERE id_album = :id_a";
+        $query_check = $this->db->getConnection()->prepare($sql_check);
+        $query_check->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+        $query_check->execute();
+        $result = $query_check->fetch(PDO::FETCH_ASSOC);
+
+        if ($result && $result['id_user'] == $userId) {
+            try {
+                $this->db->getConnection()->beginTransaction();
+
+                $sql_bridge = "DELETE FROM Photo_Albums WHERE id_album = :id_a";
+                $query_bridge = $this->db->getConnection()->prepare($sql_bridge);
+                $query_bridge->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+                $query_bridge->execute();
+
+                $sql_album = "DELETE FROM Album WHERE id_album = :id_a AND id_user = :u_id";
+                $query_album = $this->db->getConnection()->prepare($sql_album);
+                $query_album->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+                $query_album->bindValue(":u_id", $userId, PDO::PARAM_INT);
+                $query_album->execute();
+
+                $this->db->getConnection()->commit();
+                return true;
+            } catch (Throwable $e) {
+                $this->db->getConnection()->rollback();
+                return false;
+            }
+        }
+        return false;
+    }
 }
 ?>
