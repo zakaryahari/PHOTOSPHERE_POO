@@ -6,8 +6,8 @@ require_once 'database.php';
 class UserRepository implements UserRepositoryInterface {
     private Database $db ;
 
-    public function __construct(Database $conn){
-        $this->db = $conn;
+    public function __construct(){
+        $this->db = Database::getInstance();
     }
 
 
@@ -225,8 +225,8 @@ class UserRepository implements UserRepositoryInterface {
 class PhotoRepository implements PhotoRepositoryInterface {
     private Database $db ;
 
-    public function __construct(Database $conn){
-        $this->db = $conn;
+    public function __construct(){
+        $this->db = Database::getInstance();
     }
 
     public function findById(int $id): ?Photo {
@@ -360,8 +360,8 @@ class PhotoRepository implements PhotoRepositoryInterface {
 class AlbumRepository implements AlbumRepositoryInterface {
     private Database $db;
 
-    public function __construct(Database $conn) {
-        $this->db = $conn;
+    public function __construct(){
+        $this->db = Database::getInstance();
     }
 
     public function findById(int $id): ?Album {
@@ -405,57 +405,96 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return $albums;
     }
 
-    public function addPhotoToAlbum(int $id_photo, int $albumId): bool {
-        $sql = "INSERT INTO Photo_Albums (id_photo, id_album) VALUES (:id_p, :id_a)";
-        $query = $this->db->getConnection()->prepare($sql);
-        $query->bindValue(":id_p", $id_photo, PDO::PARAM_INT);
-        $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+    // public function addPhotoToAlbum(int $id_photo, int $albumId , int $userId): bool {
+        
+    //     $sql_check_album_exist = "SELECT * FROM Album WHERE albumId = :id";
+    //     $query_check_album_exist = $this->db->getConnection()->prepare($sql_check_album_exist);
+    //     $query_check_album_exist->bindValue(":id" , $albumId,PDO::PARAM_INT);
+    //     $query_check_album_exist->execute();
+    //     $result_check_album_exist = $query_check_album_exist->fetch(PDO::FETCH_ASSOC);
 
-        if ($query->execute()) {
-            $sql_update = "UPDATE Album SET photo_count = photo_count + 1 WHERE id_album = :id_a";
-            $update = $this->db->getConnection()->prepare($sql_update);
-            $update->bindValue(":id_a", $albumId, PDO::PARAM_INT);
-            return $update->execute();
+    //     $sql_check_photo_exist = "SELECT * FROM Photo WHERE id_photo = :id";
+    //     $query_check_photo_exist = $this->db->getConnection()->prepare($sql_check_album_exist);
+    //     $query_check_photo_exist->bindValue(":id" , $id_photo,PDO::PARAM_INT);
+    //     $query_check_photo_exist->execute();
+    //     $result_check_photo_exist = $query_check_photo_exist->fetch(PDO::FETCH_ASSOC);        
+
+    //     if ($result_check_album_exist['id_user'] == $userId && $result_check_photo_exist['id_user'] == $userId) {
+    //         $sql_total_photos = "SELECT al.photo_count FROM Album al join Photo_Albums pa on al.id_album = pa.id_album where id_photo = :id";
+    //         $query_total_photos = $this->db->getConnection()->prepare($sql_total_photos);
+    //         $query_total_photos->bindValue(":id_photo" , $id_photo , PDO::PARAM_INT);
+    //         $query_total_photos->execute();
+    //         $result_total_photos = $query_total_photos->fetch(PDO::FETCH_ASSOC);
+    //         if ($result_total_photos['total'] < 100 && $result_total_photos['total'] > 0) {
+    //             $this->db->getConnection()->beginTransaction();
+                
+    //         } 
+    //     }
+
+    //     // $is_pub = true;
+    //     // if (count($result_check_album_exist) == 0) {
+
+    //     $sql = "INSERT INTO Photo_Albums (id_photo, id_album) VALUES (:id_p, :id_a)";
+    //     $query = $this->db->getConnection()->prepare($sql);
+    //     $query->bindValue(":id_p", $id_photo, PDO::PARAM_INT);
+    //     $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+
+    //     if ($query->execute()) {
+    //         $sql_update = "UPDATE Album SET photo_count = photo_count + 1 WHERE id_album = :id_a";
+    //         $update = $this->db->getConnection()->prepare($sql_update);
+    //         $update->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+    //         return $update->execute();
+    //     }
+    //     return false;
+    // }
+
+    public function addPhotoToAlbum(int $id_photo, int $albumId , int $userId): bool {
+        
+        $sql_check_album_exist = "SELECT id_user, photo_count FROM Album WHERE id_album = :id";
+        $query_check_album_exist = $this->db->getConnection()->prepare($sql_check_album_exist);
+        $query_check_album_exist->bindValue(":id" , $albumId, PDO::PARAM_INT);
+        $query_check_album_exist->execute();
+        $result_check_album_exist = $query_check_album_exist->fetch(PDO::FETCH_ASSOC);
+
+        $sql_check_photo_exist = "SELECT id_user FROM Photo WHERE id_photo = :id";
+        $query_check_photo_exist = $this->db->getConnection()->prepare($sql_check_photo_exist);
+        $query_check_photo_exist->bindValue(":id" , $id_photo, PDO::PARAM_INT);
+        $query_check_photo_exist->execute();
+        $result_check_photo_exist = $query_check_photo_exist->fetch(PDO::FETCH_ASSOC);        
+
+
+        if ($result_check_album_exist && $result_check_photo_exist && 
+            $result_check_album_exist['id_user'] == $userId && 
+            $result_check_photo_exist['id_user'] == $userId) {
+            
+
+            if ($result_check_album_exist['photo_count'] < 100) {
+                try {
+                    $this->db->getConnection()->beginTransaction();
+
+                    $sql = "INSERT IGNORE INTO Photo_Albums (id_photo, id_album) VALUES (:id_p, :id_a)";
+                    $query = $this->db->getConnection()->prepare($sql);
+                    $query->bindValue(":id_p", $id_photo, PDO::PARAM_INT);
+                    $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+                    $query->execute();
+
+                    if ($query->rowCount() > 0) { 
+                        $sql_update = "UPDATE Album SET photo_count = photo_count + 1 WHERE id_album = :id_a";
+                        $update = $this->db->getConnection()->prepare($sql_update);
+                        $update->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+                        $update->execute();
+                    }
+
+                    $this->db->getConnection()->commit();
+                    return true;
+                } catch (Exception $e) {
+                    $this->db->getConnection()->rollBack();
+                    return false;
+                }
+            }
         }
         return false;
     }
 
-    public function removePhotoFromAlbum(int $id_photo, int $albumId): bool {
-        $sql = "DELETE FROM Photo_Albums WHERE id_photo = :id_p AND id_album = :id_a";
-        $query = $this->db->getConnection()->prepare($sql);
-        $query->bindValue(":id_p", $id_photo, PDO::PARAM_INT);
-        $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
-
-        if ($query->execute()) {
-            $sql_update = "UPDATE Album SET photo_count = photo_count - 1 WHERE id_album = :id_a";
-            $update = $this->db->getConnection()->prepare($sql_update);
-            $update->bindValue(":id_a", $albumId, PDO::PARAM_INT);
-            return $update->execute();
-        }
-        return false;
-    }
-
-    public function save(Album $album): bool {
-        if ($album->getId() == 0) {
-            $sql = "INSERT INTO Album (name, description, is_public, id_user) VALUES (:name, :desc, :public, :user)";
-            $query = $this->db->getConnection()->prepare($sql);
-            $query->bindValue(":name", $album->getName());
-            $query->bindValue(":desc", $album->getDescription());
-            $query->bindValue(":public", $album->getIsPublic(), PDO::PARAM_BOOL);
-            $query->bindValue(":user", $album->getUserId(), PDO::PARAM_INT);
-            return $query->execute();
-        }
-
-        if ($album->getId() > 0) {
-            $sql = "UPDATE Album SET name = :name, description = :desc, is_public = :public WHERE id_album = :id";
-            $query = $this->db->getConnection()->prepare($sql);
-            $query->bindValue(":name", $album->getName());
-            $query->bindValue(":desc", $album->getDescription());
-            $query->bindValue(":public", $album->getIsPublic(), PDO::PARAM_BOOL);
-            $query->bindValue(":id", $album->getId(), PDO::PARAM_INT);
-            return $query->execute();
-        }
-        return false;
-    }
 }
 ?>
