@@ -53,4 +53,38 @@ trait TimestampableTrait {
         return $this->updatedAt;
     }
 }
+
+trait LikeableTrait {
+    protected int $likeCount = 0;
+    protected array $likedBy = [];
+
+    public function addLike(int $userId): bool {
+        if (!$this->isLikedBy($userId)) {
+            $this->likedBy[] = $userId;
+            return true;
+        }
+        return false;
+    }
+
+    public function removeLike(int $userId): bool {
+        $this->likedBy = array_values(array_diff($this->likedBy, [$userId]));
+        return true;
+    }
+
+    public function isLikedBy(int $userId): bool {
+        if (in_array($userId, $this->likedBy)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getLikeCount(): int {
+        return $this->likeCount++;
+    }
+
+    public function getLikedBy(): array {
+        return $this->likedBy;
+    }
+}
+
 ?>
