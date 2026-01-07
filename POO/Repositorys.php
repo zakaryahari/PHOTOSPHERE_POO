@@ -701,5 +701,52 @@ class TagRepository implements TagRepositoryInterface {
         return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function searchTags(string $query, int $limit = 20): array {
+        $sql = "SELECT * FROM Tag WHERE name LIKE :q ORDER BY name ASC LIMIT :l";
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bindValue(":q", $query . '%');
+        $stmt->bindValue(":l", $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    
+
+    public function getPhotosByTag(string $tagName, int $page = 1, int $perPage = 30): array {
+        $offset = ($page - 1) * $perPage;
+        
+        $sql = "SELECT p.*, u.username 
+                FROM Photo p
+                JOIN user u ON p.id_user = u.id_user
+                JOIN Photo_Tags pt ON p.id_photo = pt.id_photo
+                JOIN Tag t ON pt.id_tag = t.id_tag
+                WHERE t.name = :n
+                LIMIT :l OFFSET :o";
+                
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":n", $tagName);
+        $query->bindValue(":l", $perPage, PDO::PARAM_INT);
+        $query->bindValue(":o", $offset, PDO::PARAM_INT);
+        $query->execute();
+        
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getTagStats(string $tagName): array {
+        $sql = "SELECT COUNT(pt.id_photo) as total_usage 
+                FROM Photo_Tags pt
+                JOIN Tag t ON pt.id_tag = t.id_tag
+                WHERE t.name = :n";
+                
+        $query = $this->db->getConnection()->prepare($sql);
+        $query->bindValue(":n", $tagName);
+        $query->execute();
+        
+        return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    
+
 }
 ?>
