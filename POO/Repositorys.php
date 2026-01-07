@@ -496,5 +496,47 @@ class AlbumRepository implements AlbumRepositoryInterface {
         return false;
     }
 
+    public function removePhotoFromAlbum(int $id_photo, int $albumId, int $userId): bool {
+
+        $sql_check_owner = "SELECT id_user FROM Album WHERE id_album = :id_a";
+        $query_check_owner = $this->db->getConnection()->prepare($sql_check_owner);
+        $query_check_owner->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+        $query_check_owner->execute();
+        $result_owner = $query_check_owner->fetch(PDO::FETCH_ASSOC);
+
+        if ($result_owner && $result_owner['id_user'] == $userId) {
+            
+            try {
+
+                $this->db->getConnection()->beginTransaction();
+
+                $sql = "DELETE FROM Photo_Albums WHERE id_photo = :id_p AND id_album = :id_a";
+                $query = $this->db->getConnection()->prepare($sql);
+                $query->bindValue(":id_p", $id_photo, PDO::PARAM_INT);
+                $query->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+                $query->execute();
+
+                if ($query->rowCount() > 0) {
+                    $sql_update = "UPDATE Album SET photo_count = photo_count - 1 WHERE id_album = :id_a AND photo_count > 0";
+                    $update = $this->db->getConnection()->prepare($sql_update);
+                    $update->bindValue(":id_a", $albumId, PDO::PARAM_INT);
+                    $update->execute();
+                }
+
+                $this->db->getConnection()->commit();
+                return true;
+
+            } catch (Throwable $e) {
+                $this->db->getConnection()->rollback();
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+
+
+    
 }
 ?>
