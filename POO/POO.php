@@ -267,7 +267,8 @@ class Admin extends User {
     }
 }
 
-class Photo {
+class Photo implements Taggable, Likeable, Commentable {
+    use TaggableTrait, TimestampableTrait, LikeableTrait, CommentableTrait;
     protected int $id;
     protected string $title;
     protected ?string $description;
@@ -276,8 +277,11 @@ class Photo {
     protected string $mimeType;
     protected string $dimensions;
     protected string $state;
-    protected int $viewCount;
     protected int $userId;
+    private bool $isPublic;
+    protected int $viewCount;
+    private int $likeCount;
+    private int $commentCount;
 
     public function __construct(array $data) {
         $this->id = $data['id_photo'];
@@ -290,6 +294,10 @@ class Photo {
         $this->state = $data['state'] ?? 'draft';
         $this->viewCount = $data['view_count'] ?? 0;
         $this->userId = $data['id_user'];
+        $this->likeCount = $data['like_count'] ?? 0;
+        $this->viewCount = $data['view_count'] ?? 0;
+        $this->commentCount = $data['comment_count'] ?? 0;
+        $this->initializeTimestamps();
     }
 
     // Getters & Setters
@@ -331,6 +339,18 @@ class Photo {
 
     public function getUserId(): int { 
         return $this->userId; 
+    }
+
+    public function getIsPublic(): bool { 
+        return $this->isPublic; 
+    }
+
+    public function getLikeCount(): int { 
+        return $this->likeCount; 
+    }
+
+    public function getCommentCount(): int { 
+        return $this->commentCount; 
     }
 
     public function setTitle(string $title): void {
